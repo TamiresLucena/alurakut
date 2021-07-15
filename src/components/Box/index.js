@@ -55,6 +55,6 @@ const Box = styled.div`
     border-radius: 10000px;
     background-color: #6F92BB;
   }
-`; 
+`;
 
 export default Box
