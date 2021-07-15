@@ -28,7 +28,7 @@ export default function Home() {
   const [comunidades, setComunidades] = useState([])
 
   useEffect(() => {
-    fetch('https://api.github.com/users/TamiresLucena/follower')
+    fetch('https://api.github.com/users/TamiresLucena/followers')
       .then((seguidores) => {
         seguidores.json().then((seguidoresTratados) => {
           const loginsSeguimores = seguidoresTratados.map((seguidor) => {
