@@ -28,14 +28,19 @@ export default function Home() {
   const [comunidades, setComunidades] = useState([])
 
   useEffect(() => {
-    fetch('https://api.github.com/users/TamiresLucena/followers')
+    fetch('https://api.github.com/users/TamiresLucena/follower')
       .then((seguidores) => {
         seguidores.json().then((seguidoresTratados) => {
           const loginsSeguimores = seguidoresTratados.map((seguidor) => {
             return seguidor.login
           })
+          if (loginsSeguimores.length > 6) loginsSeguimores.length = 6
           setPessoasFavoritas(loginsSeguimores)
+        }).catch((err) => {
+          throw err
         })
+      }).catch((err) => {
+        console.log('ERRO ------', err)
       })
   }, []);
 
@@ -45,8 +50,8 @@ export default function Home() {
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
           <ProfileSidebar githubUser={usuarioAleatorio} />
-
         </div>
+
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box>
             <h1 className="title"> Bem vindo(a)</h1>
@@ -65,7 +70,8 @@ export default function Home() {
               }
 
               const comunidadesAtualizadas = [...comunidades, comunidade]
-              setComunidades(comunidadesAtualizadas)
+              if (comunidadesAtualizadas.length < 7) setComunidades(comunidadesAtualizadas)
+              else alert('Você só pode possuir 6 comunidades!')
             }}>
               <div>
                 <input name="title" type="text" placeholder="Qual o nome da sua comunidade?" aria-label="Qual o nome da sua comunidade?" />
@@ -79,7 +85,6 @@ export default function Home() {
             </form>
           </Box>
         </div>
-
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
           <ProfileRelationsBoxWrapper>
