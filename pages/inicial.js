@@ -45,33 +45,6 @@ export default function Home({ githubUser }) {
       })
   }, []);
 
-
-  // API GraphQL
-  //   fetch('https://graphql.datocms.com/', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Authorization': '7f7590695431ea76f84616a4b4d32d',
-  //       'Content-Type': 'application/json',
-  //       'Accept': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       "query": `query {
-  //       allCommunities {
-  //         id 
-  //         title
-  //         imageUrl
-  //         creatorSlug
-  //       }
-  //     }`
-  //   }).then((response) => response.json()) // Pega o retorno do response.json() e já retorna
-  //     .then((respostaCompleta) => {
-  //       const comunidadesVindasDoDato = respostaCompleta.data.allCommunities;
-  //       console.log(comunidadesVindasDoDato)
-  //       setComunidades(comunidadesVindasDoDato)
-  //     })
-  // }, []);
-
-
   return (
     <>
       <AlurakutMenu githubUser={githubUser} />
