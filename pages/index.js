@@ -1,124 +1,77 @@
-import MainGrid from '../src/components/MainGrid'
-import Box from '../src/components/Box'
-import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
-import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+// Hook do NextJS
+import { useRouter } from 'next/router';
+import nookies from 'nookies';
 
-function ProfileSidebar(propriedades) {
-  console.log(propriedades);
-  return (
-    <Box as="aside">
-      <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px' }} />
-      <hr />
-      <p>
-        <a className="boxLink" href={`https://github.com/${propriedades.githubUser}`}>
-          @{propriedades.githubUser}
-        </a>
-      </p>
-      <hr />
-      <AlurakutProfileSidebarMenuDefault />
-    </Box>
-  )
-}
+export default function LoginScreen() {
+    const router = useRouter();
+    const [githubUser, setGithubUser] = React.useState('TamiresLucena');
 
-export default function Home() {
+    return (
+        <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <div className="loginScreen">
+                <section className="logoArea">
+                    <img src="https://alurakut.vercel.app/logo.svg" />
+                    <p><strong>Conecte-se</strong> aos seus amigos e familiares usando recados e mensagens instantâneas</p>
+                    <p><strong>Conheça</strong> novas pessoas através de amigos de seus amigos e comunidades</p>
+                    <p><strong>Compartilhe</strong> seus vídeos, fotos e paixões em um só lugar</p>
+                </section>
 
-  const usuarioAleatorio = 'TamiresLucena';
-  const [pessoasFavoritas, setPessoasFavoritas] = useState([])
-  const [comunidades, setComunidades] = useState([])
+                <section className="formArea">
+                    <form className="box" onSubmit={(infosDoEvento) => {
+                        infosDoEvento.preventDefault();
+                        // alert('Alguém clicou no botão!')
+                        console.log('Usuário: ', githubUser)
+                        fetch('https://alurakut.vercel.app/api/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ githubUser: githubUser })
+                        })
+                            .then(async (respostaDoServer) => {
+                                const dadosDaResposta = await respostaDoServer.json()
+                                const token = dadosDaResposta.token;
+                                nookies.set(null, 'USER_TOKEN', token, {
+                                    path: '/',
+                                    maxAge: 86400 * 7
+                                })
+                                router.push('/inicial')
+                            })
+                    }}>
+                        <p>
+                            Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!
+                        </p>
+                        <input
+                            placeholder="Usuário"
+                            value={githubUser}
+                            onChange={(evento) => {
+                                setGithubUser(evento.target.value)
+                            }} />
+                        {githubUser.length === 0 ? 'Preencha o campo' : ''}
+                        <button type="submit">
+                            Login
+                        </button>
+                    </form>
 
-  useEffect(() => {
-    fetch('https://api.github.com/users/TamiresLucena/followers')
-      .then((seguidores) => {
-        seguidores.json().then((seguidoresTratados) => {
-          const loginsSeguimores = seguidoresTratados.map((seguidor) => {
-            return seguidor.login
-          })
-          if (loginsSeguimores.length > 6) loginsSeguimores.length = 6
-          setPessoasFavoritas(loginsSeguimores)
-        }).catch((err) => {
-          throw err
-        })
-      }).catch((err) => {
-        console.log('ERRO ------', err)
-      })
-  }, []);
+                    <footer className="box">
+                        <p>
+                            Ainda não é membro? <br />
+                            <a href="/login">
+                                <strong>
+                                    ENTRAR JÁ
+                                </strong>
+                            </a>
+                        </p>
+                    </footer>
+                </section>
 
-  return (
-    <>
-      <AlurakutMenu githubUser={usuarioAleatorio} />
-      <MainGrid>
-        <div className="profileArea" style={{ gridArea: 'profileArea' }}>
-          <ProfileSidebar githubUser={usuarioAleatorio} />
-        </div>
-
-        <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
-          <Box>
-            <h1 className="title"> Bem vindo(a)</h1>
-            <OrkutNostalgicIconSet confiavel={1} sexy={3} />
-          </Box>
-          <Box>
-            <h2 className="subTitle">O que você deseja fazer?</h2>
-            <form onSubmit={function handleCriarComunidade(e) {
-              e.preventDefault();
-              const dadosDoForm = new FormData(e.target)
-
-              const comunidade = {
-                id: new Date().toISOString(),
-                title: dadosDoForm.get('title'),
-                image: dadosDoForm.get('image')
-              }
-
-              const comunidadesAtualizadas = [...comunidades, comunidade]
-              if (comunidadesAtualizadas.length < 7) setComunidades(comunidadesAtualizadas)
-              else alert('Você só pode possuir 6 comunidades!')
-            }}>
-              <div>
-                <input name="title" type="text" placeholder="Qual o nome da sua comunidade?" aria-label="Qual o nome da sua comunidade?" />
-              </div>
-              <div>
-                <input name="image" placeholder="Entre com um numero qualquer que será a imagem da sua comunidade!" aria-label="Entre com um numero qualquer que será a imagem da sua comunidade!" />
-              </div>
-              <button>
-                Criar comunidade
-              </button>
-            </form>
-          </Box>
-        </div>
-
-        <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle"> Conexões GitHub ({pessoasFavoritas.length}) </h2>
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => {
-                return (
-                  <li key={itemAtual}>
-                    <a href={`/users/${itemAtual}`} >
-                      <img src={`https://github.com/${itemAtual}.png`} />
-                      <span>{itemAtual}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle"> Minhas comunidades ({comunidades.length})</h2>
-            <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.id}>
-                    <a href={`/users/${itemAtual.title}`} >
-                      <img src={`https://picsum.photos/200/300?${itemAtual.image}`} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-        </div>
-      </MainGrid>
-    </>
-  )
+                <footer className="footerArea">
+                    <p>
+                        © 2021 alura.com.br - <a href="/">Sobre o Orkut.br</a> - <a href="/">Centro de segurança</a> - <a href="/">Privacidade</a> - <a href="/">Termos</a> - <a href="/">Contato</a>
+                    </p>
+                </footer>
+            </div>
+        </main>
+    )
 }

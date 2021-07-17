@@ -35,7 +35,7 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
+          <a href={`/`}>
             Sair
           </a>
           <div>
@@ -240,7 +240,6 @@ AlurakutProfileSidebarMenuDefault.Wrapper = styled.div`
 // OrkutNostalgicIconSet
 // ================================================================================================================
 export function OrkutNostalgicIconSet(props) {
-  console.log(props)
   return (
     <OrkutNostalgicIconSet.List>
       {[
